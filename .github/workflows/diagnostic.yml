@@ -1,0 +1,27 @@
+name: Diagnostic Check
+
+on: [workflow_dispatch]
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check APP_ENV
+        if: ${{ vars.APP_ENV == '' }}
+        run: echo "🛑 ::error::APP_ENV is not set!"
+
+      - name: Check API_KEY
+        run: |
+          if [ -z "API_KEY"]; then
+            echo "🛑 ::error::API_KEY is not set!"
+          fi
+
+      - name: Generate Summary
+        run: |
+          echo "### 🔧 Diagnostic" >> $GITHUB_STEP_SUMMARY
+          echo "- APP_ENV: ${APP_ENV:-❌ Not defined}" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$API_KEY" ]; then
+            echo "- API_KEY: ✅ Present" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- API_KEY: ❌ Not defined" >> $GITHUB_STEP_SUMMARY
+          fi
